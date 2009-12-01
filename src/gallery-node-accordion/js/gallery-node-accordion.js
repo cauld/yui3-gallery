@@ -99,13 +99,14 @@ var UA = Y.UA,
 	HOST = "host",
 
 	//	Attribute keys
-	ATTR_ORIENTATION = 'orientation',
-	ATTR_FADE 		 = 'fade',
-	ATTR_MULTIPLE 	 = 'multiple',
-	ATTR_PERSISTENT  = 'persistent',
-	ATTR_SPEED  	 = 'speed',
-	ATTR_ANIM		 = 'anim',
-	ATTR_ITEMS		 = 'items',
+	ATTR_ORIENTATION     = 'orientation',
+	ATTR_ORIENTATION_MAX = 'orientation_max',
+	ATTR_FADE 		     = 'fade',
+	ATTR_MULTIPLE 	     = 'multiple',
+	ATTR_PERSISTENT      = 'persistent',
+	ATTR_SPEED  	     = 'speed',
+	ATTR_ANIM		     = 'anim',
+	ATTR_ITEMS		     = 'items',
 	
 	//	CSS class names
 	CLASS_ACCORDION 			 = getClassName(ACCORDION),
@@ -188,6 +189,18 @@ NodeAccordion.ATTRS = {
 	*/
 	orientation: {
 		value: HEIGHT,
+		writeOnce: true
+	},
+	/**
+	* orientation_max defines the maxium expansion size 
+	*
+	* @attribute orientation_max
+	* @writeOnce
+	* @default null
+	* @type numeric
+	*/
+	orientation_max: {
+		value: null,
 		writeOnce: true
 	},
 	/**
@@ -391,6 +404,7 @@ Y.extend(NodeAccordion, Y.Plugin.Base, {
 			i,
 			list = this.get(ATTR_ITEMS),
 			o = this.get (ATTR_ORIENTATION),
+			omax = this.get(ATTR_ORIENTATION_MAX),
 			conf = {
 				duration: this.get(ATTR_SPEED),
 				to: {
@@ -406,7 +420,10 @@ Y.extend(NodeAccordion, Y.Plugin.Base, {
 				mirror = this._root.one(FC+CLASS_ACTIVE);
             }
             // opening the selected element, based on the orientation, timer and anim attributes...
-    	    conf.to[o] = (o==WIDTH?bd.get(SCROLL_WIDTH):bd.get(SCROLL_HEIGHT)); 
+    	    conf.to[o] = (o==WIDTH?bd.get(SCROLL_WIDTH):bd.get(SCROLL_HEIGHT));
+    	    if (!Y.Lang.isNull(omax) && (omax < conf.to[o])) { 
+              conf.to[o] = omax;
+            }
     	    conf.node = bd;
     	    item.addClass(CLASS_SLIDING);
         	fn = function() {
